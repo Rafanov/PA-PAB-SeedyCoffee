@@ -83,7 +83,7 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
     if (!mounted) return;
     setState(() => _loading = false);
     if (err != null) {
-      BrewSnackbar.show(context, err, isError: true);
+      await BrewErrorDialog.show(context, err, title: 'Pendaftaran Gagal');
     } else {
       _pendingEmail = _email.text.trim();
       _setMode(_Mode.otp);
@@ -103,7 +103,7 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
     if (!mounted) return;
     setState(() => _loading = false);
     if (err != null) {
-      BrewSnackbar.show(context, err, isError: true);
+      await BrewErrorDialog.show(context, err, title: 'Verifikasi Gagal');
     } else {
       // Clear all form data after successful OTP
       _email.clear(); _password.clear();
@@ -120,17 +120,16 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
       return;
     }
     setState(() => _loading = true);
-    try {
-      await context.read<AppProvider>().sendPasswordReset(email);
-      if (!mounted) return;
-      BrewSnackbar.show(context,
-          'Password reset link sent to $email. Check your inbox.');
-      _setMode(_Mode.login);
-    } catch (e) {
-      if (!mounted) return;
-      BrewSnackbar.show(context, e.toString(), isError: true);
-    }
+    final err = await context.read<AppProvider>().sendPasswordReset(email);
+    if (!mounted) return;
     setState(() => _loading = false);
+    if (err != null) {
+      await BrewErrorDialog.show(context, err, title: 'Gagal Kirim Email');
+    } else {
+      BrewSnackbar.show(context,
+          'Link reset password telah dikirim ke $email. Cek inbox kamu.');
+      _setMode(_Mode.login);
+    }
   }
 
   void _navigateByRole() {
@@ -280,8 +279,18 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
           prefixIcon: const Icon(Icons.person_outline,
               color: AppColors.textMuted, size: 20),
           inputFormatters: [
-            FilteringTextInputFormatter.deny(
-                RegExp(r'[^\x00-\xFF]'))],
+            TextInputFormatter.withFunction((oldVal, newVal) {
+              // Remove anything that's not basic Latin letter, digit, space, dot, dash
+              final cleaned = newVal.text.replaceAll(
+                RegExp(r'[^ -~]'), '');
+              if (cleaned == newVal.text) return newVal;
+              return newVal.copyWith(
+                text: cleaned,
+                selection: TextSelection.collapsed(offset: cleaned.length),
+              );
+            }),
+            LengthLimitingTextInputFormatter(50),
+          ],
           validator: (v) {
             if (v == null || v.trim().isEmpty) return 'Full name is required';
             if (v.trim().length < 2) return 'Name is too short';
@@ -306,11 +315,19 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
           prefixIcon: const Icon(Icons.phone_outlined,
               color: AppColors.textMuted, size: 20),
           inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'[\d\+\-\s]'))],
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9\+]')),
+            LengthLimitingTextInputFormatter(14),
+          ],
           validator: (v) {
-            if (v == null || v.isEmpty) return 'Phone number is required';
-            final digits = v.replaceAll(RegExp(r'[\s\-]'), '');
-            if (!RegExp(r'^(\+62|62|0)[0-9]{7,12}').hasMatch(digits)) {
+            if (v == null || v.isEmpty) return 'Nomor HP wajib diisi';
+            final d = v.trim();
+            // Remove +62 prefix for length check
+            final digits = d.startsWith('+62') ? '0' + d.substring(3) :
+                           d.startsWith('62') ? '0' + d.substring(2) : d;
+            if (digits.length < 10 || digits.length > 13) {
+              return 'Nomor HP 10-13 digit';
+            }
+            if (!RegExp(r'^(\+62|62|0)[0-9]{9,12}').hasMatch(digits)) {
               return 'Format: 08xxxxxxxxxx atau +62xxxxxxxxxx';
             }
             return null;

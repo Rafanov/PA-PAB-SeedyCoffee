@@ -76,7 +76,7 @@ class _State extends State<HomeTab> {
                     childCount: menus.length,
                   ),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, mainAxisSpacing: 14, crossAxisSpacing: 14, childAspectRatio: 0.76),
+                    crossAxisCount: 2, mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.68),
                 )),
       ]),
     );

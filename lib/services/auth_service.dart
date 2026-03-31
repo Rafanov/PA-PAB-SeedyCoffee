@@ -49,6 +49,20 @@ class AuthService {
 
     if (EnvConfig.useSupabase) {
       try {
+        // Check if email already confirmed in DB before attempting signUp
+        try {
+          final statusRes = await SupabaseConfig.client
+              .rpc('check_email_status', params: {'p_email': email.trim()});
+          if (statusRes != null) {
+            final exists = statusRes['exists'] == true;
+            final confirmed = statusRes['confirmed'] == true;
+            if (exists && confirmed) {
+              return 'Email sudah terdaftar dan terverifikasi. Silakan login.';
+            }
+            // If exists but not confirmed → allow re-register (will update profile)
+          }
+        } catch (_) {}
+
         final res = await SupabaseConfig.client.auth.signUp(
           email: email.trim(),
           password: password,
@@ -56,20 +70,37 @@ class AuthService {
         );
         if (res.user == null) return 'Registration failed';
         try {
+          // Upsert so re-registering with same email updates profile data
           await SupabaseConfig.client
               .from(SupabaseConfig.tableProfiles)
               .upsert({
-            'id': res.user!.id,
+            'id':        res.user!.id,
             'full_name': fullName.trim(),
-            'role': 'customer',
-            'phone': phone.trim().isEmpty ? null : phone.trim(),
-          });
+            'email':     email.trim(),
+            'role':      'customer',
+            'phone':     phone.trim().isEmpty ? null : phone.trim(),
+          }, onConflict: 'id');
         } catch (_) {}
         return null;
       } on AuthException catch (e) {
-        return e.message;
+        final msg = e.message.toLowerCase();
+        if (msg.contains('already registered') || msg.contains('user already registered')) {
+          return 'Email sudah terdaftar. Silakan login atau gunakan email lain.';
+        }
+        if (msg.contains('invalid email')) {
+          return 'Format email tidak valid.';
+        }
+        if (msg.contains('weak password') || msg.contains('password')) {
+          return 'Password terlalu lemah. Min. 6 karakter.';
+        }
+        return 'Pendaftaran gagal: ' + e.message;
       } catch (e) {
-        return e.toString();
+        final err = e.toString().toLowerCase();
+        if (err.contains('socketexception') || err.contains('failed host lookup') ||
+            err.contains('network') || err.contains('connection')) {
+          return 'Tidak ada koneksi internet. Periksa WiFi atau data seluler.';
+        }
+        return 'Tidak dapat terhubung ke server. Periksa koneksi internet.';
       }
     }
     return null;
@@ -232,9 +263,27 @@ class AuthService {
   }
 
   // ── Password Reset ──────────────────────────────────────────
-  Future<void> sendPasswordReset(String email) async {
-    if (!EnvConfig.useSupabase) return;
-    await SupabaseConfig.client.auth.resetPasswordForEmail(email.trim());
+  Future<String?> sendPasswordReset(String email) async {
+    if (!EnvConfig.useSupabase) return 'Supabase not configured';
+    try {
+      await SupabaseConfig.client.auth.resetPasswordForEmail(email.trim());
+      return null;
+    } on AuthException catch (e) {
+      final msg = e.message.toLowerCase();
+      if (msg.contains('rate limit') || msg.contains('over_email_send_rate_limit') || e.statusCode == '429') {
+        return 'Terlalu banyak percobaan. Tunggu beberapa menit lalu coba lagi.';
+      }
+      return 'Gagal mengirim reset link: ' + e.message;
+    } catch (e) {
+      final err = e.toString().toLowerCase();
+      if (err.contains('socketexception') || err.contains('failed host lookup')) {
+        return 'Tidak ada koneksi internet.';
+      }
+      if (err.contains('rate_limit') || err.contains('429')) {
+        return 'Terlalu banyak percobaan. Tunggu beberapa menit lalu coba lagi.';
+      }
+      return 'Gagal mengirim reset link. Coba lagi nanti.';
+    }
   }
 
   // ── Sign Out ─────────────────────────────────────────────────

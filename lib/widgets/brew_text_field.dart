@@ -3,6 +3,16 @@ import 'package:flutter/services.dart';
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
 
+// Global emoji-blocking formatter - use everywhere except notes/promo
+final _emojiBlockFormatter = TextInputFormatter.withFunction((oldVal, newVal) {
+  final cleaned = newVal.text.replaceAll(RegExp(r'[^ -~]'), '');
+  if (cleaned == newVal.text) return newVal;
+  return newVal.copyWith(
+    text: cleaned,
+    selection: TextSelection.collapsed(offset: cleaned.length),
+  );
+});
+
 class BrewTextField extends StatefulWidget {
   final String label, hint;
   final TextEditingController controller;

@@ -17,88 +17,109 @@ class MenuCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 12, offset: const Offset(0, 4))]),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-          // ── Image ───────────────────────────────────────────
-          ClipRRect(
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(18)),
-            child: AspectRatio(
-              aspectRatio: 1.1,
-              child: Stack(children: [
-                // Image
-                Positioned.fill(child:
+              color: Colors.black.withOpacity(0.07),
+              blurRadius: 10, offset: const Offset(0, 3))]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Image ───────────────────────────────────────────
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16)),
+              child: AspectRatio(
+                aspectRatio: 1.0,
+                child: Stack(fit: StackFit.expand, children: [
+                  // Image
                   menu.imageUrl != null && menu.imageUrl!.isNotEmpty
                       ? Image.network(menu.imageUrl!, fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Center(
-                              child: Icon(Icons.coffee_rounded,
-                                  size: 50, color: AppColors.lightGray)))
-                      : const Center(child: Icon(Icons.coffee_rounded,
-                          size: 50, color: AppColors.lightGray))),
+                          errorBuilder: (_, __, ___) => Container(
+                            color: AppColors.offWhite,
+                            child: const Icon(Icons.coffee_rounded,
+                                size: 40, color: AppColors.lightGray)))
+                      : Container(color: AppColors.offWhite,
+                          child: const Icon(Icons.coffee_rounded,
+                              size: 40, color: AppColors.lightGray)),
 
-                // Sold Out overlay
-                if (isSoldOut)
-                  Positioned.fill(child: Container(
-                    color: Colors.black.withOpacity(0.6),
-                    child: const Center(child: Text('SOLD OUT',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 13, letterSpacing: 2))))),
+                  // Sold out overlay
+                  if (isSoldOut)
+                    Container(
+                      color: Colors.black.withOpacity(0.58),
+                      child: const Center(child: Text('SOLD OUT',
+                          style: TextStyle(color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 12, letterSpacing: 2)))),
 
-                // Label badge (top-left)
-                if (menu.badge != null && !isSoldOut)
-                  Positioned(top: 8, left: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: _labelColor(menu.badge!),
-                        borderRadius: BorderRadius.circular(8)),
-                      child: Text(menu.badge!, style: const TextStyle(
-                          color: Colors.white, fontSize: 9,
-                          fontWeight: FontWeight.w800)))),
-              ])),
-          ),
+                  // Badge
+                  if (menu.badge != null && !isSoldOut)
+                    Positioned(top: 8, left: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 7, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: _labelColor(menu.badge!),
+                          borderRadius: BorderRadius.circular(6)),
+                        child: Text(menu.badge!, style: const TextStyle(
+                            color: Colors.white, fontSize: 8,
+                            fontWeight: FontWeight.w800)))),
+                ])),
+            ),
 
-          // ── Info ────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+            // ── Info ────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-              Text(menu.name,
-                  style: AppTextStyles.labelMedium
-                      .copyWith(fontWeight: FontWeight.w800,
+                  // Name
+                  Text(menu.name,
+                      style: TextStyle(
+                          fontSize: 13, fontWeight: FontWeight.w700,
                           color: isSoldOut
                               ? AppColors.midGray : AppColors.textPrimary),
-                  maxLines: 1, overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 8),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                Text(Helpers.formatPrice(menu.price),
-                    style: AppTextStyles.priceMain.copyWith(
-                        fontSize: 13,
-                        color: isSoldOut
-                            ? AppColors.midGray : null)),
-                if (!isSoldOut)
-                  Container(
-                    width: 30, height: 30,
-                    decoration: BoxDecoration(
-                      color: AppColors.black,
-                      borderRadius: BorderRadius.circular(10)),
-                    child: const Icon(Icons.add,
-                        color: Colors.white, size: 18)),
-              ]),
-              if (menu.originalPrice != null && !isSoldOut)
-                Text(Helpers.formatPrice(menu.originalPrice!),
-                    style: AppTextStyles.priceStrike),
-            ]),
-          ),
-        ]),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 6),
+                  // Price row
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(Helpers.formatPrice(menu.price),
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    color: isSoldOut
+                                        ? AppColors.midGray
+                                        : const Color(0xFF8B4513))),
+                            if (menu.originalPrice != null && !isSoldOut)
+                              Text(Helpers.formatPrice(menu.originalPrice!),
+                                  style: const TextStyle(
+                                      fontSize: 10,
+                                      color: AppColors.midGray,
+                                      decoration: TextDecoration.lineThrough)),
+                          ],
+                        ),
+                      ),
+                      if (!isSoldOut)
+                        Container(
+                          width: 28, height: 28,
+                          decoration: BoxDecoration(
+                            color: AppColors.black,
+                            borderRadius: BorderRadius.circular(8)),
+                          child: const Icon(Icons.add,
+                              color: Colors.white, size: 16)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

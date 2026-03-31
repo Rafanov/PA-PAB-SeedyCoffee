@@ -152,7 +152,7 @@ class AppProvider extends ChangeNotifier {
   Future<String?> resendOtp(String email) async =>
       AuthService.instance.resendOtp(email);
 
-  Future<void> sendPasswordReset(String email) async =>
+  Future<String?> sendPasswordReset(String email) =>
       AuthService.instance.sendPasswordReset(email);
 
   Future<void> logout() async {

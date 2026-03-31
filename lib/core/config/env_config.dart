@@ -43,4 +43,5 @@ class EnvConfig {
   static bool get useFonnte  => fonnte.isNotEmpty && fonnte.length > 5;
   static bool get useMidtrans => midtransClientKey.isNotEmpty;
   static bool get isDev       => appEnv == 'development';
+
 }

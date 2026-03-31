@@ -212,7 +212,13 @@ class _State extends State<AdminMenuFormScreen> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start,
               children: [
             _field('Menu Name *', _name, 'e.g. Velvet Cappuccino', maxLength: 100,
-                formatters: [FilteringTextInputFormatter.deny(RegExp(r'[^\x00-\xFF]'))]
+                formatters: [TextInputFormatter.withFunction((oldVal, newVal) {
+              final cleaned = newVal.text.replaceAll(RegExp(r'[^\x20-\x7E]'), '');
+              if (cleaned == newVal.text) return newVal;
+              return newVal.copyWith(
+                text: cleaned,
+                selection: TextSelection.collapsed(offset: cleaned.length));
+            })]
               ),
             Padding(padding: const EdgeInsets.only(bottom: 12),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start,
@@ -291,7 +297,13 @@ class _State extends State<AdminMenuFormScreen> {
                 ])),
             _field('Description', _desc, 'Describe this menu...',
                 maxLines: 3,
-                formatters: [FilteringTextInputFormatter.deny(RegExp(r'[^\x00-\xFF]'))],
+                formatters: [TextInputFormatter.withFunction((oldVal, newVal) {
+              final cleaned = newVal.text.replaceAll(RegExp(r'[^\x20-\x7E]'), '');
+              if (cleaned == newVal.text) return newVal;
+              return newVal.copyWith(
+                text: cleaned,
+                selection: TextSelection.collapsed(offset: cleaned.length));
+            })],
                 maxLength: 500),
           ]),
         ),

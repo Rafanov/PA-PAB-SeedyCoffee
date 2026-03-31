@@ -301,7 +301,14 @@ class _EditState extends State<_EditProfileSheet> {
             prefixIcon: const Icon(Icons.person_outline,
                 color: AppColors.textMuted, size: 20),
             inputFormatters: [
-              FilteringTextInputFormatter.deny(RegExp(r'[^\x00-\xFF]')),
+              TextInputFormatter.withFunction((oldVal, newVal) {
+                final cleaned = newVal.text.replaceAll(
+                  RegExp(r'[^\x20-\x7E]'), '');
+                if (cleaned == newVal.text) return newVal;
+                return newVal.copyWith(
+                  text: cleaned,
+                  selection: TextSelection.collapsed(offset: cleaned.length));
+              }),
               LengthLimitingTextInputFormatter(50),
             ],
             validator: (v) {
