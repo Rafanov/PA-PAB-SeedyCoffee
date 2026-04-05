@@ -23,13 +23,13 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
   bool _loading = false;
   String _pendingEmail = '';
 
-  final _email     = TextEditingController();
-  final _password  = TextEditingController();
-  final _fullName  = TextEditingController();
-  final _phone     = TextEditingController();
-  final _otp       = TextEditingController();
-  final _formKey   = GlobalKey<FormState>();
-  final _loginKey  = GlobalKey<FormState>();
+  final _email    = TextEditingController();
+  final _password = TextEditingController();
+  final _fullName = TextEditingController();
+  final _phone    = TextEditingController();
+  final _otp      = TextEditingController();
+  final _formKey  = GlobalKey<FormState>();
+  final _loginKey = GlobalKey<FormState>();
 
   late final AnimationController _anim =
       AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
@@ -58,7 +58,6 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
     _anim..reset()..forward();
   }
 
-  // ── Login ────────────────────────────────────────────────────
   Future<void> _login() async {
     if (!(_loginKey.currentState?.validate() ?? false)) return;
     setState(() => _loading = true);
@@ -73,7 +72,6 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
     }
   }
 
-  // ── Register ─────────────────────────────────────────────────
   Future<void> _register() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     setState(() => _loading = true);
@@ -83,15 +81,14 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
     if (!mounted) return;
     setState(() => _loading = false);
     if (err != null) {
-      await BrewErrorDialog.show(context, err, title: 'Pendaftaran Gagal');
+      BrewSnackbar.show(context, err, isError: true);
     } else {
       _pendingEmail = _email.text.trim();
       _setMode(_Mode.otp);
-      BrewSnackbar.show(context, 'OTP sent to ${_pendingEmail}');
+      BrewSnackbar.show(context, 'OTP sent to $_pendingEmail');
     }
   }
 
-  // ── Verify OTP ───────────────────────────────────────────────
   Future<void> _verifyOtp() async {
     final code = _otp.text.trim();
     if (code.length != 6) {
@@ -103,16 +100,14 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
     if (!mounted) return;
     setState(() => _loading = false);
     if (err != null) {
-      await BrewErrorDialog.show(context, err, title: 'Verifikasi Gagal');
+      BrewSnackbar.show(context, err, isError: true);
     } else {
-      // Clear all form data after successful OTP
       _email.clear(); _password.clear();
       _fullName.clear(); _phone.clear(); _otp.clear();
       _navigateByRole();
     }
   }
 
-  // ── Forgot Password ──────────────────────────────────────────
   Future<void> _sendResetPassword() async {
     final email = _email.text.trim();
     if (email.isEmpty || !email.contains('@')) {
@@ -120,39 +115,28 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
       return;
     }
     setState(() => _loading = true);
-    final err = await context.read<AppProvider>().sendPasswordReset(email);
-    if (!mounted) return;
-    setState(() => _loading = false);
-    if (err != null) {
-      await BrewErrorDialog.show(context, err, title: 'Gagal Kirim Email');
-    } else {
-      BrewSnackbar.show(context,
-          'Link reset password telah dikirim ke $email. Cek inbox kamu.');
+    try {
+      await context.read<AppProvider>().sendPasswordReset(email);
+      if (!mounted) return;
+      BrewSnackbar.show(context, 'Password reset link sent to $email. Check your inbox.');
       _setMode(_Mode.login);
+    } catch (e) {
+      if (!mounted) return;
+      BrewSnackbar.show(context, e.toString(), isError: true);
     }
+    setState(() => _loading = false);
   }
 
   void _navigateByRole() {
     final role = context.read<AppProvider>().currentUser?.role;
     if (role == UserRole.admin) {
-      Navigator.pushNamedAndRemoveUntil(
-          context, AppConstants.routeAdmin, (_) => false);
+      Navigator.pushNamedAndRemoveUntil(context, AppConstants.routeAdmin, (_) => false);
     } else if (role == UserRole.cashier) {
-      Navigator.pushNamedAndRemoveUntil(
-          context, AppConstants.routeKasir, (_) => false);
+      Navigator.pushNamedAndRemoveUntil(context, AppConstants.routeKasir, (_) => false);
     } else {
-      Navigator.pushNamedAndRemoveUntil(
-          context, AppConstants.routeMain, (_) => false);
+      Navigator.pushNamedAndRemoveUntil(context, AppConstants.routeMain, (_) => false);
     }
   }
-
-  // ── Emoji filter ─────────────────────────────────────────────
-  static String _stripEmoji(String v) =>
-      v.replaceAll(RegExp(r'[\u{1F600}-\u{1F64F}' 
-          r'\u{1F300}-\u{1F5FF}'
-          r'\u{1F680}-\u{1F6FF}'
-          r'\u{2600}-\u{26FF}'
-          r'\u{2700}-\u{27BF}]', unicode: true), '');
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -161,14 +145,11 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
       padding: const EdgeInsets.all(24),
       child: FadeTransition(opacity: _fade, child: Column(children: [
         const SizedBox(height: 20),
-        // Logo
         SizedBox(width: 100, height: 100,
           child: ClipRRect(borderRadius: BorderRadius.circular(16),
-            child: Image.asset('assets/images/LogoSeedy.jpg',
-                fit: BoxFit.cover))),
+            child: Image.asset('assets/images/LogoSeedy.jpg', fit: BoxFit.cover))),
         const SizedBox(height: 16),
-        Text(AppConstants.appName,
-            style: AppTextStyles.displayMedium.copyWith(fontSize: 28)),
+        Text(AppConstants.appName, style: AppTextStyles.displayMedium.copyWith(fontSize: 28)),
         const SizedBox(height: 6),
         Text(_modeSubtitle, style: AppTextStyles.bodySmall),
         const SizedBox(height: 32),
@@ -177,31 +158,27 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
     )));
 
   String get _modeSubtitle => switch (_mode) {
-    _Mode.choose       => 'Welcome back',
-    _Mode.login        => 'Sign in to your account',
-    _Mode.register     => 'Create your account',
-    _Mode.otp          => 'Check your email',
+    _Mode.choose         => 'Welcome back',
+    _Mode.login          => 'Sign in to your account',
+    _Mode.register       => 'Create your account',
+    _Mode.otp            => 'Check your email',
     _Mode.forgotPassword => 'Reset your password',
   };
 
   Widget _buildBody() => switch (_mode) {
-    _Mode.choose        => _choose(),
-    _Mode.login         => _loginForm(),
-    _Mode.register      => _registerForm(),
-    _Mode.otp           => _otpForm(),
+    _Mode.choose         => _choose(),
+    _Mode.login          => _loginForm(),
+    _Mode.register       => _registerForm(),
+    _Mode.otp            => _otpForm(),
     _Mode.forgotPassword => _forgotForm(),
   };
 
-  // ── Choose ───────────────────────────────────────────────────
   Widget _choose() => Column(children: [
-    BrewButton(label: 'Login',
-        onPressed: () => _setMode(_Mode.login)),
+    BrewButton(label: 'Login', onPressed: () => _setMode(_Mode.login)),
     const SizedBox(height: 12),
     BrewButton(label: 'Create Account',
-        style: BrewButtonStyle.outline,
-        onPressed: () => _setMode(_Mode.register)),
+        style: BrewButtonStyle.outline, onPressed: () => _setMode(_Mode.register)),
     const SizedBox(height: 28),
-    // Demo accounts
     Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(color: Colors.white,
@@ -214,14 +191,12 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
         _demoRow('Admin',    'admin@breworder.com'),
         _demoRow('Kasir',    'kasir@breworder.com'),
         const SizedBox(height: 6),
-        Text('Password: Test123!', style: AppTextStyles.caption
-            .copyWith(color: AppColors.midGray)),
+        Text('Password: Test123!', style: AppTextStyles.caption.copyWith(color: AppColors.midGray)),
       ])),
     const SizedBox(height: 16),
-    TextButton(onPressed: () => Navigator.pop(context),
-        child: Text('Back to Menu',
-            style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.midGray))),
+    TextButton(
+      onPressed: () => Navigator.pop(context),
+      child: Text('Back to Menu', style: AppTextStyles.bodySmall.copyWith(color: AppColors.midGray))),
   ]);
 
   Widget _demoRow(String role, String email) => Padding(
@@ -233,135 +208,130 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
           style: AppTextStyles.caption.copyWith(color: AppColors.midGray))),
     ]));
 
-  // ── Login Form ───────────────────────────────────────────────
   Widget _loginForm() => Form(
     key: _loginKey,
     child: Column(children: [
-      BrewTextField(label: 'Email', hint: 'your@email.com',
-          controller: _email, keyboardType: TextInputType.emailAddress,
-          prefixIcon: const Icon(Icons.email_outlined,
-              color: AppColors.textMuted, size: 20),
-          validator: (v) {
-            if (v == null || v.isEmpty) return 'Email is required';
-            if (!v.contains('@')) return 'Enter a valid email';
-            return null;
-          }),
+      BrewTextField(
+        label: 'Email', hint: 'your@email.com',
+        controller: _email, keyboardType: TextInputType.emailAddress,
+        prefixIcon: const Icon(Icons.email_outlined, color: AppColors.textMuted, size: 20),
+        inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
+        validator: (v) {
+          if (v == null || v.isEmpty) return 'Email is required';
+          if (!v.contains('@')) return 'Enter a valid email';
+          return null;
+        }),
       const SizedBox(height: 14),
-      BrewTextField(label: 'Password', hint: 'Your password',
-          controller: _password, isPassword: true,
-          prefixIcon: const Icon(Icons.lock_outline,
-              color: AppColors.textMuted, size: 20),
-          validator: (v) => v == null || v.isEmpty
-              ? 'Password is required' : null),
+      BrewTextField(
+        label: 'Password', hint: 'Your password',
+        controller: _password, isPassword: true,
+        prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textMuted, size: 20),
+        validator: (v) => v == null || v.isEmpty ? 'Password is required' : null),
       const SizedBox(height: 8),
       Align(alignment: Alignment.centerRight,
         child: TextButton(
           onPressed: () => _setMode(_Mode.forgotPassword),
-          child: Text('Forgot Password?',
-              style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.black, fontWeight: FontWeight.w700)))),
+          child: Text('Forgot Password?', style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.black, fontWeight: FontWeight.w700)))),
       const SizedBox(height: 16),
-      BrewButton(label: 'Login',
-          isLoading: _loading, onPressed: _login),
+      BrewButton(label: 'Login', isLoading: _loading, onPressed: _login),
       const SizedBox(height: 12),
-      TextButton(onPressed: () => _setMode(_Mode.choose),
-          child: Text('Back',
-              style: AppTextStyles.bodySmall
-                  .copyWith(color: AppColors.midGray))),
+      TextButton(
+        onPressed: () => _setMode(_Mode.choose),
+        child: Text('Back', style: AppTextStyles.bodySmall.copyWith(color: AppColors.midGray))),
     ]));
 
-  // ── Register Form ────────────────────────────────────────────
   Widget _registerForm() => Form(
     key: _formKey,
     child: Column(children: [
-      BrewTextField(label: 'Full Name', hint: 'Your full name',
-          controller: _fullName,
-          prefixIcon: const Icon(Icons.person_outline,
-              color: AppColors.textMuted, size: 20),
-          inputFormatters: [
-            TextInputFormatter.withFunction((oldVal, newVal) {
-              // Remove anything that's not basic Latin letter, digit, space, dot, dash
-              final cleaned = newVal.text.replaceAll(
-                RegExp(r'[^ -~]'), '');
-              if (cleaned == newVal.text) return newVal;
-              return newVal.copyWith(
-                text: cleaned,
-                selection: TextSelection.collapsed(offset: cleaned.length),
-              );
-            }),
-            LengthLimitingTextInputFormatter(50),
-          ],
-          validator: (v) {
-            if (v == null || v.trim().isEmpty) return 'Full name is required';
-            if (v.trim().length < 2) return 'Name is too short';
-            return null;
-          }),
+
+      // ── Full Name: no emoji (Android + iOS) ──────────────────
+      Padding(
+        padding: const EdgeInsets.only(bottom: 14),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('FULL NAME', style: AppTextStyles.labelSmall),
+          const SizedBox(height: 6),
+          TextFormField(
+            controller: _fullName,
+            keyboardType: TextInputType.visiblePassword,
+            enableSuggestions: false,
+            autocorrect: false,
+            maxLength: 50,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[ -~\u00C0-\u00FF]')),
+            ],
+            style: AppTextStyles.bodyMedium,
+            decoration: InputDecoration(
+              hintText: 'Your full name',
+              counterText: '',
+              prefixIcon: const Icon(Icons.person_outline,
+                  color: AppColors.textMuted, size: 20),
+            ),
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) return 'Full name is required';
+              if (v.trim().length < 2) return 'Name is too short';
+              return null;
+            },
+          ),
+        ]),
+      ),
+
+      // ── Email ─────────────────────────────────────────────────
+      BrewTextField(
+        label: 'Email', hint: 'your@email.com',
+        controller: _email, keyboardType: TextInputType.emailAddress,
+        prefixIcon: const Icon(Icons.email_outlined, color: AppColors.textMuted, size: 20),
+        inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
+        validator: (v) {
+          if (v == null || v.isEmpty) return 'Email is required';
+          if (!RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+').hasMatch(v.trim()))
+            return 'Enter a valid email';
+          return null;
+        }),
       const SizedBox(height: 14),
-      BrewTextField(label: 'Email', hint: 'your@email.com',
-          controller: _email, keyboardType: TextInputType.emailAddress,
-          prefixIcon: const Icon(Icons.email_outlined,
-              color: AppColors.textMuted, size: 20),
-          inputFormatters: [
-            FilteringTextInputFormatter.deny(RegExp(r'\s'))],
-          validator: (v) {
-            if (v == null || v.isEmpty) return 'Email is required';
-            if (!RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+')
-                .hasMatch(v.trim())) return 'Enter a valid email';
-            return null;
-          }),
+
+      // ── Phone: hanya angka + tanda + ─────────────────────────
+      BrewTextField(
+        label: 'Phone (WhatsApp)', hint: '08xxxxxxxxxx',
+        controller: _phone, keyboardType: TextInputType.phone,
+        prefixIcon: const Icon(Icons.phone_outlined, color: AppColors.textMuted, size: 20),
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[\d\+]')), // hanya digit & +
+          LengthLimitingTextInputFormatter(15),
+        ],
+        validator: (v) {
+          if (v == null || v.isEmpty) return 'Phone number is required';
+          if (!RegExp(r'^(\+62|62|0)[0-9]{8,12}$').hasMatch(v))
+            return 'Format: 08xxxxxxxxxx atau +62xxxxxxxxxx';
+          return null;
+        }),
       const SizedBox(height: 14),
-      BrewTextField(label: 'Phone (WhatsApp)', hint: '08xxxxxxxxxx',
-          controller: _phone, keyboardType: TextInputType.phone,
-          prefixIcon: const Icon(Icons.phone_outlined,
-              color: AppColors.textMuted, size: 20),
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'[0-9\+]')),
-            LengthLimitingTextInputFormatter(14),
-          ],
-          validator: (v) {
-            if (v == null || v.isEmpty) return 'Nomor HP wajib diisi';
-            final d = v.trim();
-            // Remove +62 prefix for length check
-            final digits = d.startsWith('+62') ? '0' + d.substring(3) :
-                           d.startsWith('62') ? '0' + d.substring(2) : d;
-            if (digits.length < 10 || digits.length > 13) {
-              return 'Nomor HP 10-13 digit';
-            }
-            if (!RegExp(r'^(\+62|62|0)[0-9]{9,12}').hasMatch(digits)) {
-              return 'Format: 08xxxxxxxxxx atau +62xxxxxxxxxx';
-            }
-            return null;
-          }),
-      const SizedBox(height: 14),
-      BrewTextField(label: 'Password', hint: 'Min. 6 characters',
-          controller: _password, isPassword: true,
-          prefixIcon: const Icon(Icons.lock_outline,
-              color: AppColors.textMuted, size: 20),
-          validator: (v) {
-            if (v == null || v.isEmpty) return 'Password is required';
-            if (v.length < 6) return 'Min. 6 characters';
-            if (!v.contains(RegExp(r'[a-zA-Z]'))) return 'Must contain a letter';
-            if (!v.contains(RegExp(r'[0-9!@#%^&*]'))) {
-              return 'Add a number or symbol (!@#%^&*)';
-            }
-            return null;
-          }),
+
+      // ── Password ──────────────────────────────────────────────
+      BrewTextField(
+        label: 'Password', hint: 'Min. 6 characters',
+        controller: _password, isPassword: true,
+        prefixIcon: const Icon(Icons.lock_outline, color: AppColors.textMuted, size: 20),
+        validator: (v) {
+          if (v == null || v.isEmpty) return 'Password is required';
+          if (v.length < 6) return 'Min. 6 characters';
+          if (!v.contains(RegExp(r'[a-zA-Z]'))) return 'Must contain a letter';
+          if (!v.contains(RegExp(r'[0-9!@#%^&*]')))
+            return 'Add a number or symbol (!@#%^&*)';
+          return null;
+        }),
       const SizedBox(height: 8),
       ValueListenableBuilder<TextEditingValue>(
         valueListenable: _password,
-        builder: (_, val, __) =>
-            _PasswordStrength(password: val.text)),
+        builder: (_, val, __) => _PasswordStrength(password: val.text)),
       const SizedBox(height: 20),
-      BrewButton(label: 'Create Account',
-          isLoading: _loading, onPressed: _register),
+      BrewButton(label: 'Create Account', isLoading: _loading, onPressed: _register),
       const SizedBox(height: 12),
-      TextButton(onPressed: () => _setMode(_Mode.choose),
-          child: Text('Back',
-              style: AppTextStyles.bodySmall
-                  .copyWith(color: AppColors.midGray))),
+      TextButton(
+        onPressed: () => _setMode(_Mode.choose),
+        child: Text('Back', style: AppTextStyles.bodySmall.copyWith(color: AppColors.midGray))),
     ]));
 
-  // ── OTP Form ─────────────────────────────────────────────────
   Widget _otpForm() => Column(children: [
     Container(
       padding: const EdgeInsets.all(16),
@@ -369,49 +339,42 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.silverGray)),
       child: Column(children: [
-        const Icon(Icons.mark_email_read_outlined,
-            size: 40, color: AppColors.black),
+        const Icon(Icons.mark_email_read_outlined, size: 40, color: AppColors.black),
         const SizedBox(height: 12),
         Text('OTP sent to', style: AppTextStyles.bodySmall),
         const SizedBox(height: 4),
-        Text(_pendingEmail, style: AppTextStyles.labelMedium,
-            textAlign: TextAlign.center),
+        Text(_pendingEmail, style: AppTextStyles.labelMedium, textAlign: TextAlign.center),
       ])),
     const SizedBox(height: 20),
-    BrewTextField(label: 'Verification Code',
-        hint: '0 0 0 0 0 0',
-        controller: _otp,
-        keyboardType: TextInputType.number,
-        inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly,
-          LengthLimitingTextInputFormatter(6),
-        ],
-        prefixIcon: const Icon(Icons.pin_outlined,
-            color: AppColors.textMuted, size: 20)),
+    BrewTextField(
+      label: 'Verification Code', hint: '0 0 0 0 0 0',
+      controller: _otp, keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        LengthLimitingTextInputFormatter(6),
+      ],
+      prefixIcon: const Icon(Icons.pin_outlined, color: AppColors.textMuted, size: 20)),
     const SizedBox(height: 6),
-    Text('Check your inbox (and spam folder)',
-        style: AppTextStyles.caption),
+    Text('Check your inbox (and spam folder)', style: AppTextStyles.caption),
     const SizedBox(height: 20),
-    BrewButton(label: 'Verify & Continue',
-        isLoading: _loading, onPressed: _verifyOtp),
+    BrewButton(label: 'Verify & Continue', isLoading: _loading, onPressed: _verifyOtp),
     const SizedBox(height: 12),
-    BrewButton(label: 'Resend Code',
-        style: BrewButtonStyle.outline,
-        onPressed: _loading ? null : () async {
-          setState(() => _loading = true);
-          await context.read<AppProvider>().resendOtp(_pendingEmail);
-          if (!mounted) return;
-          setState(() => _loading = false);
-          BrewSnackbar.show(context, 'OTP resent!');
-        }),
+    BrewButton(
+      label: 'Resend Code', style: BrewButtonStyle.outline,
+      onPressed: _loading ? null : () async {
+        setState(() => _loading = true);
+        await context.read<AppProvider>().resendOtp(_pendingEmail);
+        if (!mounted) return;
+        setState(() => _loading = false);
+        BrewSnackbar.show(context, 'OTP resent!');
+      }),
     const SizedBox(height: 12),
-    TextButton(onPressed: () => _setMode(_Mode.register),
-        child: Text('Back to Register',
-            style: AppTextStyles.bodySmall
-                .copyWith(color: AppColors.midGray))),
+    TextButton(
+      onPressed: () => _setMode(_Mode.register),
+      child: Text('Back to Register',
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.midGray))),
   ]);
 
-  // ── Forgot Password Form ──────────────────────────────────────
   Widget _forgotForm() => Column(children: [
     Container(
       padding: const EdgeInsets.all(16),
@@ -419,34 +382,31 @@ class _State extends State<LoginScreen> with SingleTickerProviderStateMixin {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.silverGray)),
       child: Column(children: [
-        const Icon(Icons.lock_reset_rounded,
-            size: 40, color: AppColors.black),
+        const Icon(Icons.lock_reset_rounded, size: 40, color: AppColors.black),
         const SizedBox(height: 12),
         Text('Enter your registered email and we\'ll send a password reset link.',
             style: AppTextStyles.bodySmall, textAlign: TextAlign.center),
       ])),
     const SizedBox(height: 20),
-    BrewTextField(label: 'Email', hint: 'your@email.com',
-        controller: _email, keyboardType: TextInputType.emailAddress,
-        prefixIcon: const Icon(Icons.email_outlined,
-            color: AppColors.textMuted, size: 20),
-        validator: (v) {
-          if (v == null || v.isEmpty) return 'Email is required';
-          if (!v.contains('@')) return 'Enter a valid email';
-          return null;
-        }),
+    BrewTextField(
+      label: 'Email', hint: 'your@email.com',
+      controller: _email, keyboardType: TextInputType.emailAddress,
+      prefixIcon: const Icon(Icons.email_outlined, color: AppColors.textMuted, size: 20),
+      validator: (v) {
+        if (v == null || v.isEmpty) return 'Email is required';
+        if (!v.contains('@')) return 'Enter a valid email';
+        return null;
+      }),
     const SizedBox(height: 20),
-    BrewButton(label: 'Send Reset Link',
-        isLoading: _loading, onPressed: _sendResetPassword),
+    BrewButton(label: 'Send Reset Link', isLoading: _loading, onPressed: _sendResetPassword),
     const SizedBox(height: 12),
-    TextButton(onPressed: () => _setMode(_Mode.login),
-        child: Text('Back to Login',
-            style: AppTextStyles.bodySmall
-                .copyWith(color: AppColors.midGray))),
+    TextButton(
+      onPressed: () => _setMode(_Mode.login),
+      child: Text('Back to Login',
+          style: AppTextStyles.bodySmall.copyWith(color: AppColors.midGray))),
   ]);
 }
 
-// ── Password Strength ─────────────────────────────────────────────────────────
 class _PasswordStrength extends StatelessWidget {
   final String password;
   const _PasswordStrength({required this.password});
@@ -463,8 +423,7 @@ class _PasswordStrength extends StatelessWidget {
   }
 
   String get _label => switch (_score) {
-    0 => '', 1 => 'Weak', 2 => 'Fair',
-    3 => 'Good', 4 => 'Strong', _ => 'Very Strong',
+    0 => '', 1 => 'Weak', 2 => 'Fair', 3 => 'Good', 4 => 'Strong', _ => 'Very Strong',
   };
 
   Color get _color => switch (_score) {
@@ -488,8 +447,7 @@ class _PasswordStrength extends StatelessWidget {
           valueColor: AlwaysStoppedAnimation<Color>(_color),
           minHeight: 4))),
       const SizedBox(width: 10),
-      Text(_label, style: TextStyle(
-          fontSize: 11, fontWeight: FontWeight.w700, color: _color)),
+      Text(_label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: _color)),
     ]);
   }
 }
