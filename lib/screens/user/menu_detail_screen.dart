@@ -68,19 +68,29 @@ class _State extends State<MenuDetailScreen> {
     Navigator.pop(context);
   }
 
+  // Cek apakah ada customization options
+  bool get _hasCustomization {
+    final m = widget.menu;
+    return (m.sizeOptions?.isNotEmpty == true) ||
+           (m.sugarOptions?.isNotEmpty == true) ||
+           (m.iceOptions?.isNotEmpty == true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final m = widget.menu;
     final isSoldOut = !m.isAvailable;
+    final bottomPad = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
       backgroundColor: AppColors.offWhite,
-      body: Stack(children: [
-        // ── Scrollable content ──────────────────────────────
-        SingleChildScrollView(
-          child: Column(children: [
-            // Hero image
-            Stack(children: [
+      // ── Gunakan Stack hanya untuk back button di atas gambar
+      // Footer sekarang di dalam scroll, tidak melayang
+      body: CustomScrollView(
+        slivers: [
+          // ── Hero image dengan back button overlay ────────────
+          SliverToBoxAdapter(
+            child: Stack(children: [
               Container(
                 height: 280,
                 width: double.infinity,
@@ -93,169 +103,150 @@ class _State extends State<MenuDetailScreen> {
                     : const Center(child: Icon(Icons.coffee_rounded,
                         size: 60, color: Colors.white54)),
               ),
-              // Sold out overlay on image
               if (isSoldOut)
                 Positioned.fill(child: Container(
                   color: Colors.black.withOpacity(0.55),
                   child: const Center(child: Text('SOLD OUT',
-                      style: TextStyle(
-                          color: Colors.white, fontSize: 22,
+                      style: TextStyle(color: Colors.white, fontSize: 22,
                           fontWeight: FontWeight.w900, letterSpacing: 3))))),
-              // Back button
               Positioned(
-                top: MediaQuery.of(context).padding.top + 8,
-                left: 12,
+                top: MediaQuery.of(context).padding.top + 8, left: 12,
                 child: CircleAvatar(
                   backgroundColor: Colors.black.withOpacity(0.45),
                   child: IconButton(
                     icon: const Icon(Icons.arrow_back_ios_new_rounded,
                         color: Colors.white, size: 16),
                     onPressed: () => Navigator.pop(context)))),
-              // Badge
               if (m.badge != null)
                 Positioned(bottom: 12, left: 16,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: _badgeColor(m.badge!),
-                      borderRadius: BorderRadius.circular(8)),
+                        color: _badgeColor(m.badge!),
+                        borderRadius: BorderRadius.circular(8)),
                     child: Text(m.badge!, style: const TextStyle(
                         color: Colors.white, fontSize: 11,
                         fontWeight: FontWeight.w800)))),
             ]),
-
-            // ── Detail content ──────────────────────────────
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Name
-                  Text(m.name,
-                      style: AppTextStyles.displayMedium.copyWith(
-                          color: isSoldOut ? AppColors.midGray : null)),
-                  const SizedBox(height: 4),
-                  Text(m.categoryName, style: AppTextStyles.bodySmall),
-                  const SizedBox(height: 16),
-
-                  // Description
-                  if (m.description != null && m.description!.isNotEmpty) ...[
-                    GestureDetector(
-                      onTap: m.description!.length > 120
-                          ? () => setState(() => _expanded = !_expanded)
-                          : null,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(m.description!,
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                  color: AppColors.textSecondary, height: 1.65),
-                              maxLines: m.description!.length > 120
-                                  ? (_expanded ? null : 3) : null,
-                              overflow: m.description!.length > 120 && !_expanded
-                                  ? TextOverflow.ellipsis : null),
-                          if (m.description!.length > 120) ...[
-                            const SizedBox(height: 4),
-                            Text(_expanded ? 'Show less ↑' : 'Read more ↓',
-                                style: AppTextStyles.bodySmall.copyWith(
-                                    color: AppColors.black,
-                                    fontWeight: FontWeight.w700)),
-                          ],
-                        ],
-                      ),
-                    ),
-                    const Divider(height: 30),
-                  ],
-
-                  // Options — disabled if sold out
-                  if (!isSoldOut) ...[
-                    if (m.sizeOptions != null)
-                      _opts('Size', m.sizeOptions!, _size,
-                          (v) => setState(() => _size = v)),
-                    if (m.sugarOptions != null)
-                      _opts('Sugar', m.sugarOptions!, _sugar,
-                          (v) => setState(() => _sugar = v)),
-                    if (m.iceOptions != null)
-                      _opts('Ice / Temp', m.iceOptions!, _ice,
-                          (v) => setState(() => _ice = v)),
-
-                    // Note
-                    Text('Note to Barista', style: AppTextStyles.labelMedium),
-                    const SizedBox(height: 4),
-                    Text('Optional — any special requests?',
-                        style: AppTextStyles.caption),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _noteCtrl,
-                      maxLines: 3, maxLength: 200,
-                      style: AppTextStyles.bodyMedium,
-                      decoration: const InputDecoration(
-                          hintText: 'e.g. Extra hot, less ice...')),
-                  ] else ...[
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.offWhite,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: AppColors.silverGray)),
-                      child: Row(children: [
-                        const Icon(Icons.info_outline_rounded,
-                            size: 20, color: AppColors.midGray),
-                        const SizedBox(width: 12),
-                        Expanded(child: Text(
-                            'Menu ini sedang tidak tersedia. '
-                            'Silakan cek lagi nanti!',
-                            style: AppTextStyles.bodySmall)),
-                      ])),
-                  ],
-                ],
-              ),
-            ),
-          ]),
-        ),
-
-        // ── Bottom bar ──────────────────────────────────────
-        Positioned(
-          bottom: 0, left: 0, right: 0,
-          child: Container(
-            padding: EdgeInsets.fromLTRB(
-                20, 12, 20, MediaQuery.of(context).padding.bottom + 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 20, offset: const Offset(0, -4))]),
-            child: Row(children: [
-              // Price
-              Expanded(child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(Helpers.formatPrice(m.price * _qty),
-                    style: AppTextStyles.priceLarge),
-                if (m.originalPrice != null)
-                  Text(Helpers.formatPrice(m.originalPrice! * _qty),
-                      style: AppTextStyles.priceStrike),
-              ])),
-              // Qty selector (hidden when sold out)
-              if (!isSoldOut) ...[
-                _qBtn(Icons.remove_rounded,
-                    () => setState(() { if (_qty > 1) _qty--; })),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('$_qty',
-                      style: AppTextStyles.labelLarge.copyWith(fontSize: 18))),
-                _qBtn(Icons.add_rounded,
-                    () { if (_qty < 10) setState(() => _qty++); }),
-                const SizedBox(width: 12),
-              ],
-              // Button
-              SizedBox(width: 130, child: BrewButton(
-                  label: isSoldOut ? 'Sold Out' : 'Add to Cart',
-                  onPressed: isSoldOut ? null : _addToCart)),
-            ]),
           ),
-        ),
-      ]),
+
+          // ── Detail content ────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                Text(m.name, style: AppTextStyles.displayMedium.copyWith(
+                    color: isSoldOut ? AppColors.midGray : null)),
+                const SizedBox(height: 4),
+                Text(m.categoryName, style: AppTextStyles.bodySmall),
+                const SizedBox(height: 16),
+
+                // Description
+                if (m.description != null && m.description!.isNotEmpty) ...[
+                  GestureDetector(
+                    onTap: m.description!.length > 120
+                        ? () => setState(() => _expanded = !_expanded) : null,
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                      Text(m.description!,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textSecondary, height: 1.65),
+                          maxLines: m.description!.length > 120
+                              ? (_expanded ? null : 3) : null,
+                          overflow: m.description!.length > 120 && !_expanded
+                              ? TextOverflow.ellipsis : null),
+                      if (m.description!.length > 120) ...[
+                        const SizedBox(height: 4),
+                        Text(_expanded ? 'Show less ↑' : 'Read more ↓',
+                            style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.black,
+                                fontWeight: FontWeight.w700)),
+                      ],
+                    ]),
+                  ),
+                  const Divider(height: 30),
+                ],
+
+                // Customization options
+                if (!isSoldOut) ...[
+                  if (m.sizeOptions != null)
+                    _opts('Size', m.sizeOptions!, _size,
+                        (v) => setState(() => _size = v)),
+                  if (m.sugarOptions != null)
+                    _opts('Sugar', m.sugarOptions!, _sugar,
+                        (v) => setState(() => _sugar = v)),
+                  if (m.iceOptions != null)
+                    _opts('Ice / Temp', m.iceOptions!, _ice,
+                        (v) => setState(() => _ice = v)),
+
+                  Text('Note to Barista', style: AppTextStyles.labelMedium),
+                  const SizedBox(height: 4),
+                  Text('Optional — any special requests?',
+                      style: AppTextStyles.caption),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _noteCtrl,
+                    maxLines: 3, maxLength: 200,
+                    style: AppTextStyles.bodyMedium,
+                    decoration: const InputDecoration(
+                        hintText: 'e.g. Extra hot, less ice...')),
+                ] else ...[
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.offWhite,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppColors.silverGray)),
+                    child: Row(children: [
+                      const Icon(Icons.info_outline_rounded,
+                          size: 20, color: AppColors.midGray),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(
+                          'Menu ini sedang tidak tersedia. Silakan cek lagi nanti!',
+                          style: AppTextStyles.bodySmall)),
+                    ])),
+                ],
+
+                // ── Footer inline (tidak melayang) ────────────
+                const SizedBox(height: 24),
+                Container(
+                  padding: EdgeInsets.fromLTRB(0, 16, 0, bottomPad > 0 ? bottomPad : 16),
+                  decoration: const BoxDecoration(
+                    border: Border(top: BorderSide(color: AppColors.divider))),
+                  child: Row(children: [
+                    // Price
+                    Expanded(child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(Helpers.formatPrice(m.price * _qty),
+                          style: AppTextStyles.priceLarge),
+                      if (m.originalPrice != null)
+                        Text(Helpers.formatPrice(m.originalPrice! * _qty),
+                            style: AppTextStyles.priceStrike),
+                    ])),
+                    // Qty selector
+                    if (!isSoldOut) ...[
+                      _qBtn(Icons.remove_rounded,
+                          () => setState(() { if (_qty > 1) _qty--; })),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text('$_qty', style: AppTextStyles.labelLarge
+                            .copyWith(fontSize: 18))),
+                      _qBtn(Icons.add_rounded,
+                          () { if (_qty < 10) setState(() => _qty++); }),
+                      const SizedBox(width: 12),
+                    ],
+                    // Button
+                    SizedBox(width: 130, child: BrewButton(
+                      label: isSoldOut ? 'Sold Out' : 'Add to Cart',
+                      onPressed: isSoldOut ? null : _addToCart)),
+                  ]),
+                ),
+              ]),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
