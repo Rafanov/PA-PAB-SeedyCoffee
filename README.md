@@ -171,6 +171,16 @@ flutter build apk --dart-define-from-file=.env --release --split-per-abi
 
 Proyek Akhir — Pemrograman Aplikasi Bergerak
 
+Raihan Fariz N - 2409116083
+
+Indah Maramin Al Inayah - 2409116086
+
+RIZKY YUNIA SURONO - 2409116089
+
+Muhammad Romadhoni Alfatih - 2409116104
+
+Muhamad Irpan Santoso - 2409116119
+
 ---
 
 <p align="center">Made with ☕ and Flutter</p>
