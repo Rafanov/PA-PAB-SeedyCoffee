@@ -36,14 +36,27 @@ class AppProvider extends ChangeNotifier {
   List<OrderModel>    get allOrders     => List.unmodifiable(_orders);
 
   // Force reload all orders (used by admin dashboard)
-  Future<void> reloadAllOrders() async {
-    try {
-      _orders = await OrderService.instance.loadOrders(userId: null);
-      notifyListeners();
-    } catch (e) {
-      debugPrint('reloadAllOrders error: \$e');
-    }
+Future<void> reloadAllOrders() async {
+  try {
+    _orders = await OrderService.instance.loadOrders(userId: null);
+    notifyListeners();
+  } catch (e) {
+    debugPrint('reloadAllOrders error: $e');
   }
+}
+
+Future<void> reloadUserOrders() async {
+  if (_currentUser == null) return;
+  try {
+    final isStaff = _currentUser!.role == UserRole.admin ||
+        _currentUser!.role == UserRole.cashier;
+    _orders = await OrderService.instance.loadOrders(
+        userId: isStaff ? null : _currentUser!.id);
+    notifyListeners();
+  } catch (e) {
+    debugPrint('reloadUserOrders error: $e');
+  }
+}
   bool get isLoading     => _isLoading;
   bool get isInitialized => _isInitialized;
   bool get isLoggedIn    => _currentUser != null;

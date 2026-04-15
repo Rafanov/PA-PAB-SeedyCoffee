@@ -31,7 +31,8 @@ class ProfileTab extends StatelessWidget {
       body: CustomScrollView(slivers: [
         SliverToBoxAdapter(child: Container(
           decoration: const BoxDecoration(gradient: AppColors.headerGradient),
-          padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 14, 20, 24),
+          padding: EdgeInsets.fromLTRB(
+              20, MediaQuery.of(context).padding.top + 14, 20, 24),
           child: Column(children: [
             Stack(alignment: Alignment.bottomRight, children: [
               GestureDetector(
@@ -41,7 +42,8 @@ class ProfileTab extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.18),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withOpacity(0.45), width: 3)),
+                    border: Border.all(
+                        color: Colors.white.withOpacity(0.45), width: 3)),
                   clipBehavior: Clip.hardEdge,
                   child: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
                       ? Image.network(user.avatarUrl!, fit: BoxFit.cover,
@@ -51,12 +53,14 @@ class ProfileTab extends StatelessWidget {
                 ),
               ),
               Container(width: 26, height: 26,
-                decoration: BoxDecoration(color: AppColors.black, shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2)),
+                decoration: BoxDecoration(color: AppColors.black,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2)),
                 child: const Icon(Icons.edit_rounded, color: Colors.white, size: 14)),
             ]),
             const SizedBox(height: 12),
-            Text(user.fullName, style: AppTextStyles.headerTitle.copyWith(fontSize: 21)),
+            Text(user.fullName,
+                style: AppTextStyles.headerTitle.copyWith(fontSize: 21)),
             const SizedBox(height: 4),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -64,7 +68,8 @@ class ProfileTab extends StatelessWidget {
                 color: Colors.white.withOpacity(0.18),
                 borderRadius: BorderRadius.circular(20)),
               child: Text(user.email ?? user.username,
-                  style: AppTextStyles.headerSubtitle.copyWith(fontWeight: FontWeight.w600))),
+                  style: AppTextStyles.headerSubtitle
+                      .copyWith(fontWeight: FontWeight.w600))),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
@@ -84,11 +89,11 @@ class ProfileTab extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           sliver: SliverList(delegate: SliverChildListDelegate([
             _section('Account Info', Icons.person_outline_rounded, [
-              _row(Icons.badge_outlined,          'Full Name', user.fullName),
-              _row(Icons.email_outlined,           'Email',    user.email ?? '-'),
-              _row(Icons.phone_outlined,           'Phone',
+              _row(Icons.badge_outlined,   'Full Name', user.fullName),
+              _row(Icons.email_outlined,   'Email', user.email ?? '-'),
+              _row(Icons.phone_outlined,   'Phone',
                   user.phone?.isNotEmpty == true ? user.phone! : 'Not set'),
-              _row(Icons.calendar_today_outlined,  'Member Since',
+              _row(Icons.calendar_today_outlined, 'Member Since',
                   Helpers.formatDateShort(user.createdAt), isLast: true),
             ]),
             const SizedBox(height: 14),
@@ -98,16 +103,23 @@ class ProfileTab extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(color: Colors.white,
                   borderRadius: BorderRadius.circular(18),
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.07), blurRadius: 14)]),
+                  boxShadow: [BoxShadow(
+                      color: Colors.black.withOpacity(0.07), blurRadius: 14)]),
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 8),
                   leading: Container(width: 40, height: 40,
-                    decoration: BoxDecoration(color: AppColors.offWhite,
-                        borderRadius: BorderRadius.circular(11)),
-                    child: const Icon(Icons.receipt_long_outlined, size: 20, color: AppColors.black)),
-                  title: Text('Riwayat Pesanan', style: AppTextStyles.labelMedium),
-                  subtitle: Text('${orders.length} pesanan', style: AppTextStyles.caption),
-                  trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.midGray),
+                    decoration: BoxDecoration(
+                      color: AppColors.offWhite,
+                      borderRadius: BorderRadius.circular(11)),
+                    child: const Icon(Icons.receipt_long_outlined,
+                        size: 20, color: AppColors.black)),
+                  title: Text('Riwayat Pesanan',
+                      style: AppTextStyles.labelMedium),
+                  subtitle: Text('${orders.length} pesanan',
+                      style: AppTextStyles.caption),
+                  trailing: const Icon(Icons.chevron_right_rounded,
+                      color: AppColors.midGray),
                 ))),
             const SizedBox(height: 20),
             BrewButton(label: 'Edit Profile',
@@ -134,19 +146,23 @@ class ProfileTab extends StatelessWidget {
 
 Widget _Stat(String label, String value) =>
   Expanded(child: Column(children: [
-    Text(value, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800),
+    Text(value, style: const TextStyle(
+        color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800),
         maxLines: 1, overflow: TextOverflow.ellipsis),
     const SizedBox(height: 2),
-    Text(label, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 10)),
+    Text(label, style: TextStyle(
+        color: Colors.white.withOpacity(0.7), fontSize: 10)),
   ]));
 
-Widget _vd() => Container(width: 1, height: 32, color: Colors.white.withOpacity(0.25));
+Widget _vd() => Container(width: 1, height: 32,
+    color: Colors.white.withOpacity(0.25));
 
 Widget _section(String title, IconData icon, List<Widget> rows) =>
   Container(
     decoration: BoxDecoration(color: Colors.white,
       borderRadius: BorderRadius.circular(18),
-      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.07), blurRadius: 14)]),
+      boxShadow: [BoxShadow(
+          color: Colors.black.withOpacity(0.07), blurRadius: 14)]),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Padding(padding: const EdgeInsets.fromLTRB(16, 13, 16, 8),
         child: Row(children: [
@@ -167,10 +183,12 @@ Widget _row(IconData icon, String label, String value,
         : const Border(bottom: BorderSide(color: AppColors.divider))),
     child: Row(children: [
       Container(width: 34, height: 34,
-        decoration: BoxDecoration(color: AppColors.offWhite, borderRadius: BorderRadius.circular(9)),
+        decoration: BoxDecoration(color: AppColors.offWhite,
+            borderRadius: BorderRadius.circular(9)),
         child: Icon(icon, size: 16, color: AppColors.midGray)),
       const SizedBox(width: 12),
-      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
         Text(label.toUpperCase(), style: AppTextStyles.labelSmall),
         const SizedBox(height: 1),
         Text(value, style: AppTextStyles.bodyMedium.copyWith(
@@ -188,8 +206,10 @@ class _EditProfileSheet extends StatefulWidget {
 }
 
 class _EditState extends State<_EditProfileSheet> {
-  late final _nameCtrl  = TextEditingController(text: widget.p.currentUser?.fullName);
-  late final _phoneCtrl = TextEditingController(text: widget.p.currentUser?.phone ?? '');
+  late final _nameCtrl  = TextEditingController(
+      text: widget.p.currentUser?.fullName);
+  late final _phoneCtrl = TextEditingController(
+      text: widget.p.currentUser?.phone ?? '');
   bool _saving = false;
   bool _uploadingAvatar = false;
   Uint8List? _avatarBytes;
@@ -228,8 +248,7 @@ class _EditState extends State<_EditProfileSheet> {
 
     setState(() => _saving = true);
     final err = await widget.p.updateProfile(
-      fullName: name,
-      phone: phone.isEmpty ? null : phone);
+      fullName: name, phone: phone.isEmpty ? null : phone);
     setState(() => _saving = false);
     if (err != null) {
       if (mounted) BrewSnackbar.show(context, err, isError: true);
@@ -242,7 +261,8 @@ class _EditState extends State<_EditProfileSheet> {
   Widget build(BuildContext context) {
     final user = widget.p.currentUser!;
     return Container(
-      padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 24),
+      padding: EdgeInsets.fromLTRB(
+          24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 24),
       decoration: const BoxDecoration(color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -252,33 +272,35 @@ class _EditState extends State<_EditProfileSheet> {
         const SizedBox(height: 20),
         Text('Edit Profile', style: AppTextStyles.displaySmall),
         const SizedBox(height: 20),
-
-        // Avatar
         GestureDetector(
           onTap: _uploadingAvatar ? null : _pickAvatar,
           child: Stack(alignment: Alignment.bottomRight, children: [
             Container(width: 80, height: 80,
-              decoration: const BoxDecoration(color: AppColors.offWhite, shape: BoxShape.circle),
+              decoration: const BoxDecoration(
+                  color: AppColors.offWhite, shape: BoxShape.circle),
               clipBehavior: Clip.hardEdge,
               child: _uploadingAvatar
-                  ? const Center(child: CircularProgressIndicator(color: AppColors.black, strokeWidth: 2))
+                  ? const Center(child: CircularProgressIndicator(
+                      color: AppColors.black, strokeWidth: 2))
                   : _avatarBytes != null
                       ? Image.memory(_avatarBytes!, fit: BoxFit.cover)
                       : user.avatarUrl?.isNotEmpty == true
                           ? Image.network(user.avatarUrl!, fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) => const Icon(
-                                  Icons.person_rounded, color: AppColors.midGray, size: 40))
-                          : const Icon(Icons.person_rounded, color: AppColors.midGray, size: 40)),
+                                  Icons.person_rounded,
+                                  color: AppColors.midGray, size: 40))
+                          : const Icon(Icons.person_rounded,
+                              color: AppColors.midGray, size: 40)),
             Container(width: 26, height: 26,
-              decoration: BoxDecoration(color: AppColors.black, shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2)),
-              child: const Icon(Icons.photo_camera_outlined, color: Colors.white, size: 14)),
+              decoration: BoxDecoration(color: AppColors.black,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2)),
+              child: const Icon(Icons.photo_camera_outlined,
+                  color: Colors.white, size: 14)),
           ])),
         const SizedBox(height: 6),
         Text('Tap to change', style: AppTextStyles.caption),
         const SizedBox(height: 20),
-
-        // ── Full Name: no emoji (Android + iOS) ──────────────────
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('FULL NAME', style: AppTextStyles.labelSmall),
           const SizedBox(height: 6),
@@ -293,15 +315,12 @@ class _EditState extends State<_EditProfileSheet> {
             ],
             style: AppTextStyles.bodyMedium,
             decoration: InputDecoration(
-              hintText: 'Your full name',
-              counterText: '',
-              prefixIcon: const Icon(Icons.person_outline, color: AppColors.textMuted, size: 20),
-            ),
+              hintText: 'Your full name', counterText: '',
+              prefixIcon: const Icon(Icons.person_outline,
+                  color: AppColors.textMuted, size: 20)),
           ),
         ]),
         const SizedBox(height: 14),
-
-        // ── Phone: hanya digit + tanda + ─────────────────────────
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('PHONE (WHATSAPP)', style: AppTextStyles.labelSmall),
           const SizedBox(height: 6),
@@ -310,18 +329,16 @@ class _EditState extends State<_EditProfileSheet> {
             keyboardType: TextInputType.phone,
             maxLength: 15,
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[\d\+]')), // hanya digit & +
+              FilteringTextInputFormatter.allow(RegExp(r'[\d\+]')),
             ],
             style: AppTextStyles.bodyMedium,
             decoration: InputDecoration(
-              hintText: '08xxxxxxxxxx',
-              counterText: '',
-              prefixIcon: const Icon(Icons.phone_outlined, color: AppColors.textMuted, size: 20),
-            ),
+              hintText: '08xxxxxxxxxx', counterText: '',
+              prefixIcon: const Icon(Icons.phone_outlined,
+                  color: AppColors.textMuted, size: 20)),
           ),
         ]),
         const SizedBox(height: 22),
-
         BrewButton(label: 'Save Changes', isLoading: _saving, onPressed: _save),
       ]));
   }
@@ -337,7 +354,8 @@ class _LogoutDialog extends StatelessWidget {
     child: Padding(padding: const EdgeInsets.all(24),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Container(width: 60, height: 60,
-          decoration: const BoxDecoration(color: AppColors.errorBg, shape: BoxShape.circle),
+          decoration: const BoxDecoration(
+              color: AppColors.errorBg, shape: BoxShape.circle),
           child: const Icon(Icons.logout_rounded, color: AppColors.error, size: 28)),
         const SizedBox(height: 14),
         Text('Sign Out?', style: AppTextStyles.displaySmall),
@@ -350,15 +368,18 @@ class _LogoutDialog extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
             style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: AppColors.silverGray),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12))),
             child: const Text('Cancel'))),
           const SizedBox(width: 12),
           Expanded(child: ElevatedButton(
             onPressed: () { Navigator.pop(context); p.logout(); },
             style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.error,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-            child: const Text('Sign Out', style: TextStyle(color: Colors.white)))),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12))),
+            child: const Text('Sign Out',
+                style: TextStyle(color: Colors.white)))),
         ]),
       ])));
 }
@@ -372,13 +393,15 @@ class _GuestView extends StatelessWidget {
     body: Column(children: [
       Container(width: double.infinity,
         decoration: const BoxDecoration(gradient: AppColors.headerGradient),
-        padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 16, 20, 36),
+        padding: EdgeInsets.fromLTRB(
+            20, MediaQuery.of(context).padding.top + 16, 20, 36),
         child: Column(children: [
           Container(width: 84, height: 84,
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.15), shape: BoxShape.circle,
               border: Border.all(color: Colors.white.withOpacity(0.3), width: 3)),
-            child: const Icon(Icons.person_outline_rounded, color: Colors.white, size: 42)),
+            child: const Icon(Icons.person_outline_rounded,
+                color: Colors.white, size: 42)),
           const SizedBox(height: 14),
           const Text('Not Logged In', style: TextStyle(fontFamily: 'Playfair Display',
               color: Colors.white, fontSize: 23, fontWeight: FontWeight.w700)),
@@ -392,84 +415,153 @@ class _GuestView extends StatelessWidget {
         child: Column(children: [
           const SizedBox(height: 16),
           BrewButton(label: 'Login Now',
-              onPressed: () => Navigator.pushNamed(context, AppConstants.routeLogin)),
+              onPressed: () => Navigator.pushNamed(
+                  context, AppConstants.routeLogin)),
           const SizedBox(height: 10),
           BrewButton(label: 'Create Account',
               style: BrewButtonStyle.outline,
-              onPressed: () => Navigator.pushNamed(context, AppConstants.routeLogin)),
+              onPressed: () => Navigator.pushNamed(
+                  context, AppConstants.routeLogin)),
         ]))),
     ]));
 }
 
-// ── Order History Screen ──────────────────────────────────────────────────────
-class _OrderHistoryScreen extends StatelessWidget {
+// ── Order History Screen — dengan Pull-to-Refresh ─────────────────────────────
+class _OrderHistoryScreen extends StatefulWidget {
   const _OrderHistoryScreen();
+  @override
+  State<_OrderHistoryScreen> createState() => _OrderHistoryScreenState();
+}
+
+class _OrderHistoryScreenState extends State<_OrderHistoryScreen> {
+  bool _refreshing = false;
+
+  Future<void> _refresh() async {
+    if (_refreshing) return;
+    setState(() => _refreshing = true);
+    final p = context.read<AppProvider>();
+    // Reload orders dari server
+    await p.reloadUserOrders();
+    if (mounted) setState(() => _refreshing = false);
+  }
 
   @override
   Widget build(BuildContext context) {
     final p = context.watch<AppProvider>();
     final orders = p.userOrders;
+
     return Scaffold(
       backgroundColor: AppColors.offWhite,
-      appBar: AppBar(title: const Text('Riwayat Pesanan'),
-          backgroundColor: AppColors.black, foregroundColor: Colors.white, elevation: 0),
+      appBar: AppBar(
+        title: const Text('Riwayat Pesanan'),
+        backgroundColor: AppColors.black,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        // ── Tombol refresh di AppBar ──
+        actions: [
+          IconButton(
+            icon: _refreshing
+                ? const SizedBox(width: 18, height: 18,
+                    child: CircularProgressIndicator(
+                        color: Colors.white, strokeWidth: 2))
+                : const Icon(Icons.refresh_rounded, color: Colors.white),
+            onPressed: _refresh,
+            tooltip: 'Refresh',
+          ),
+        ],
+      ),
       body: orders.isEmpty
-          ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              const Icon(Icons.receipt_long_outlined, size: 48, color: AppColors.lightGray),
+          ? Center(child: Column(
+              mainAxisAlignment: MainAxisAlignment.center, children: [
+              const Icon(Icons.receipt_long_outlined,
+                  size: 48, color: AppColors.lightGray),
               const SizedBox(height: 12),
               Text('Belum ada pesanan',
                   style: AppTextStyles.displaySmall.copyWith(fontSize: 17)),
               const SizedBox(height: 6),
-              Text('Pesanan kamu akan muncul di sini', style: AppTextStyles.bodySmall),
+              Text('Pesanan kamu akan muncul di sini',
+                  style: AppTextStyles.bodySmall),
+              const SizedBox(height: 20),
+              TextButton.icon(
+                onPressed: _refresh,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Refresh')),
             ]))
-          : ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: orders.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (_, i) {
-                final o = orders[i];
-                return GestureDetector(
-                  onTap: () => Navigator.push(context, MaterialPageRoute(
-                      builder: (_) => OrderDetailScreen(order: o, showCode: !o.isPaid))),
-                  child: Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: o.isPaid
-                          ? AppColors.success.withOpacity(0.3) : AppColors.silverGray),
-                      boxShadow: [BoxShadow(
-                          color: Colors.black.withOpacity(0.06), blurRadius: 10)]),
-                    child: Row(children: [
-                      Container(width: 40, height: 40,
-                        decoration: BoxDecoration(
-                          color: o.isPaid ? AppColors.successBg : AppColors.offWhite,
-                          borderRadius: BorderRadius.circular(11)),
-                        child: Icon(
-                          o.isPaid ? Icons.check_circle_outline_rounded : Icons.access_time_rounded,
-                          color: o.isPaid ? AppColors.success : AppColors.midGray, size: 20)),
-                      const SizedBox(width: 12),
-                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(o.orderCode, style: AppTextStyles.labelMedium.copyWith(
-                            fontFamily: 'monospace', letterSpacing: 1)),
-                        Text(Helpers.formatDate(o.createdAt), style: AppTextStyles.caption),
-                        Text(o.items.map((i) => i.menuName).join(', '),
-                            style: AppTextStyles.bodySmall, maxLines: 1,
-                            overflow: TextOverflow.ellipsis),
-                      ])),
-                      Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                        Text(Helpers.formatPrice(o.totalAmount),
-                            style: AppTextStyles.priceMain.copyWith(fontSize: 13)),
-                        Container(margin: const EdgeInsets.only(top: 4),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          // ── Pull-to-refresh ──────────────────────────────────
+          : RefreshIndicator(
+              onRefresh: _refresh,
+              color: AppColors.black,
+              child: ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemCount: orders.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (_, i) {
+                  final o = orders[i];
+                  return GestureDetector(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(
+                        builder: (_) => OrderDetailScreen(
+                            order: o, showCode: !o.isPaid))),
+                    child: Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: o.isPaid
+                              ? AppColors.success.withOpacity(0.3)
+                              : AppColors.silverGray),
+                        boxShadow: [BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            blurRadius: 10)]),
+                      child: Row(children: [
+                        Container(width: 40, height: 40,
                           decoration: BoxDecoration(
-                            color: o.isPaid ? AppColors.successBg : AppColors.warningBg,
-                            borderRadius: BorderRadius.circular(6)),
-                          child: Text(o.isPaid ? 'Lunas' : 'Pending',
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700,
-                                  color: o.isPaid ? AppColors.successText : AppColors.warning))),
-                      ]),
-                    ])));
-              }),
+                            color: o.isPaid
+                                ? AppColors.successBg : AppColors.offWhite,
+                            borderRadius: BorderRadius.circular(11)),
+                          child: Icon(
+                            o.isPaid
+                                ? Icons.check_circle_outline_rounded
+                                : Icons.access_time_rounded,
+                            color: o.isPaid
+                                ? AppColors.success : AppColors.midGray,
+                            size: 20)),
+                        const SizedBox(width: 12),
+                        Expanded(child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                          Text(o.orderCode,
+                              style: AppTextStyles.labelMedium.copyWith(
+                                  fontFamily: 'monospace', letterSpacing: 1)),
+                          Text(Helpers.formatDate(o.createdAt),
+                              style: AppTextStyles.caption),
+                          Text(o.items.map((i) => i.menuName).join(', '),
+                              style: AppTextStyles.bodySmall,
+                              maxLines: 1, overflow: TextOverflow.ellipsis),
+                        ])),
+                        Column(crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                          Text(Helpers.formatPrice(o.totalAmount),
+                              style: AppTextStyles.priceMain
+                                  .copyWith(fontSize: 13)),
+                          Container(
+                            margin: const EdgeInsets.only(top: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: o.isPaid
+                                  ? AppColors.successBg : AppColors.warningBg,
+                              borderRadius: BorderRadius.circular(6)),
+                            child: Text(o.isPaid ? 'Lunas' : 'Pending',
+                                style: TextStyle(fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: o.isPaid
+                                        ? AppColors.successText
+                                        : AppColors.warning))),
+                        ]),
+                      ])));
+                },
+              ),
+            ),
     );
   }
 }
