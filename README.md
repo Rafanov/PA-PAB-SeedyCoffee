@@ -1,4 +1,4 @@
-# ☕ SeedyCoffee — Premium Coffee Shop App
+# ☕ SeedyOrder — Premium Coffee Shop App
 
 <p align="center">
   <img src="assets/images/LogoSeedy.jpg" alt="SeedyCoffee Logo" width="120" style="border-radius: 16px"/>
@@ -19,7 +19,7 @@
 
 ## 📱 Deskripsi Aplikasi
 
-**SeedyCoffee** adalah aplikasi mobile pemesanan kopi yang dikembangkan sebagai Proyek Akhir mata kuliah Pemrograman Aplikasi Bergerak. Aplikasi ini dirancang untuk mensimulasikan sistem pemesanan coffee shop modern dengan tiga peran pengguna: **Customer**, **Admin**, dan **Kasir**.
+**SeedyOrder** adalah aplikasi mobile pemesanan kopi yang dikembangkan sebagai Proyek Akhir mata kuliah Pemrograman Aplikasi Bergerak. Aplikasi ini dirancang untuk mensimulasikan sistem pemesanan coffee shop modern dengan tiga peran pengguna: **Customer**, **Admin**, dan **Kasir**.
 
 Customer dapat menelusuri menu, melakukan pemesanan, dan membayar menggunakan kode unik atau QR code. Admin dapat mengelola menu, banner promo, dan memantau performa bisnis melalui dashboard AI berbasis Gemini. Kasir dapat memverifikasi dan mengkonfirmasi pembayaran secara real-time menggunakan input kode manual maupun scan QR.
 
