@@ -183,4 +183,10 @@ Muhamad Irpan Santoso - 2409116119
 
 ---
 
+## Kerja Sama Mitra
+
+https://drive.google.com/file/d/1du0n5rxAX8I79nwPre0mumL20GWjNMHI/view?usp=sharing
+
+---
+
 <p align="center">Made with ☕ and Flutter</p>
