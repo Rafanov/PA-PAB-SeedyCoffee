@@ -167,6 +167,36 @@ flutter build apk --dart-define-from-file=.env --release --split-per-abi
 
 ---
 
+## 🌟 Nilai Tambah — Package Tambahan
+
+Proyek ini menggunakan beberapa package tambahan di luar yang diajarkan di praktikum:
+
+### 📷 mobile_scanner `^5.2.3`
+Package untuk membaca QR code secara real-time menggunakan kamera perangkat. Digunakan pada fitur **QR Scan di halaman Kasir** — kasir cukup mengarahkan kamera ke QR code yang ditampilkan customer, sistem langsung mendeteksi kode pesanan dan menampilkan detail pembayaran tanpa perlu input manual.
+
+### 🔲 qr_flutter `^4.1.0`
+Package untuk men-generate QR code dari sebuah string. Digunakan untuk mengubah **kode unik pesanan** menjadi QR code visual yang ditampilkan ke customer setelah checkout, sehingga kasir bisa menscannya langsung.
+
+### 📊 fl_chart `^0.70.2`
+Package chart/grafik untuk Flutter. Digunakan pada **Admin Dashboard** untuk menampilkan grafik batang (BarChart) pendapatan 7 hari terakhir secara visual, memudahkan admin memantau tren penjualan harian.
+
+### ✂️ crop_your_image `^2.0.0`
+Package untuk memotong (crop) gambar dengan rasio aspek tertentu sebelum di-upload. Digunakan saat admin upload foto menu (rasio 1:1) dan banner promo (rasio 8:3), memastikan gambar selalu proporsional dan konsisten tampilannya di aplikasi.
+
+### 🖼️ image_picker `^1.1.2`
+Package untuk mengambil gambar dari galeri perangkat. Digunakan bersama `crop_your_image` untuk fitur upload foto menu, banner, dan foto profil user.
+
+### 🔵 smooth_page_indicator `^1.2.1`
+Package untuk menampilkan indikator halaman yang smooth dan animatif. Digunakan pada **banner slider** di halaman utama customer untuk menunjukkan posisi banner aktif dengan animasi worm effect.
+
+### 🔤 google_fonts `^6.2.1`
+Package untuk menggunakan font Google secara langsung tanpa perlu download manual. Digunakan untuk tipografi aplikasi — **Playfair Display** (judul/branding) dan **DM Sans** (body text) — memberikan kesan premium dan konsisten di seluruh halaman.
+
+### 🤖 Integrasi Google Gemini 2.5 Flash (via `http ^1.2.2`)
+Integrasi langsung ke **Google Gemini AI API** menggunakan package `http` untuk HTTP request. Digunakan pada **Admin AI Dashboard** — sistem mengirimkan data penjualan (total order, revenue, top menu) ke Gemini, lalu Gemini menghasilkan analisis bisnis otomatis berupa ringkasan kondisi bisnis, highlights, rekomendasi, dan prediksi penjualan dalam Bahasa Indonesia.
+
+---
+
 ## 👥 Tim Pengembang
 
 Proyek Akhir — Pemrograman Aplikasi Bergerak
